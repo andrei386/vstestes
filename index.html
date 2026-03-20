@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Lamp</title>
+
+  <!-- Fonte Inter via Google Fonts (pesos 300, 400 e 500) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!--
+    Círculo de luz ambiente que aparece ao acender a lâmpada.
+    Fica fixo na tela e é posicionado via JavaScript sobre o abajur.
+    A opacidade é controlada pelo CSS quando a classe "light" está no body.
+  -->
+  <div class="light-glow" id="lightGlow"></div>
+
+  <!-- Título da página -->
+  <h1 class="title">Login Lamp</h1>
+
+  <main class="container">
+
+    <!-- ==================== LÂMPADA ==================== -->
+    <!--
+      Elemento clicável que alterna o estado de luz.
+      role="button" e tabindex="0" permitem ativação via teclado.
+    -->
+    <div class="lamp" id="lamp" role="button" tabindex="0" title="Clique para acender">
+
+      <!-- Abajur: parte superior arredondada da lâmpada -->
+      <div class="lamp-top"></div>
+
+      <!-- Haste vertical que conecta o abajur à base -->
+      <div class="lamp-body"></div>
+
+      <!-- Base horizontal de apoio -->
+      <div class="lamp-base"></div>
+
+      <!--
+        Cordão de acionamento.
+        O movimento de pêndulo é controlado inteiramente pelo JavaScript
+        via Web Animations API — o CSS não define nenhum transform neste elemento.
+      -->
+      <div class="cord" id="cord">
+        <!-- Bolinha decorativa no topo do cordão -->
+        <div class="cord-ball"></div>
+      </div>
+
+    </div>
+
+    <!-- ==================== FORMULÁRIO ==================== -->
+    <!--
+      Começa invisível (opacity: 0 no CSS).
+      Torna-se visível quando a classe "light" é adicionada ao body.
+      aria-hidden é atualizado pelo JavaScript conforme a visibilidade.
+    -->
+    <div class="login-form" id="loginForm" aria-hidden="true">
+      <h2>Welcome</h2>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="Email" autocomplete="email">
+
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Password" autocomplete="current-password">
+
+      <!-- O clique deste botão é capturado diretamente pelo JavaScript -->
+      <button type="button" id="btnLogin">Sign In</button>
+    </div>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

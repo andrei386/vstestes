@@ -1,0 +1,366 @@
+/* ============================================================
+   LOGIN LAMP — style.css
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   VARIÁVEIS GLOBAIS
+   Centralizadas aqui para facilitar ajustes de cor e duração.
+   ------------------------------------------------------------ */
+:root {
+  --lamp-color:    #e5e1db;             /* cor do corpo da lâmpada        */
+  --cord-color:    #aaa;                /* cor do cordão                   */
+  --ball-color:    #cfa46d;             /* cor da bolinha do cordão        */
+  --accent-from:   #f6d365;             /* início do gradiente do botão    */
+  --accent-to:     #fda085;             /* fim do gradiente do botão       */
+  --cord-duration: 2.8s;               /* duração do pêndulo do cordão    */
+}
+
+
+/* ------------------------------------------------------------
+   RESET BÁSICO
+   Remove margens, paddings e padroniza o box model.
+   ------------------------------------------------------------ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+
+/* ------------------------------------------------------------
+   BODY
+   Fundo escuro, layout centralizado em coluna, fonte padrão.
+   A transição de background cobre a mudança ao acender a luz.
+   ------------------------------------------------------------ */
+body {
+  background: #0b0f14;
+  font-family: 'Inter', Arial, sans-serif;
+  color: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  transition: background 0.8s ease;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Fundo levemente mais claro quando a luz está acesa */
+body.light {
+  background: #1c1f24;
+}
+
+
+/* ------------------------------------------------------------
+   EFEITO DE LUZ AMBIENTE (.light-glow)
+   Círculo fixo posicionado via JS sobre o abajur.
+   Gradiente radial que simula a dispersão da luz no ambiente.
+   Invisível por padrão; aparece com animação ao acender.
+   ------------------------------------------------------------ */
+.light-glow {
+  position: fixed;
+  width: 700px;
+  height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 216, 107, 0.28)  0%,   /* núcleo mais quente               */
+    rgba(255, 200,  80, 0.12) 35%,   /* transição intermediária          */
+    rgba(255, 180,  50, 0.04) 60%,   /* borda suave                      */
+    transparent                80%    /* fade até transparente             */
+  );
+  pointer-events: none;              /* não interfere em cliques          */
+  transform: translate(-50%, -50%);  /* centraliza no ponto definido pelo JS */
+  opacity: 0;
+  transition: opacity 1.2s ease;    /* fade suave ao apagar              */
+  z-index: 0;
+}
+
+/* Ao acender: exibe o glow com animação de entrada */
+body.light .light-glow {
+  opacity: 1;
+  animation: lightFade 1.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Animação de entrada do glow: sobe levemente e expande */
+@keyframes lightFade {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -55%) scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+
+/* ------------------------------------------------------------
+   TÍTULO
+   Leveza visual com font-weight baixo e espaçamento de letras.
+   Muda para dourado ao acender, acompanhando o tom da luz.
+   ------------------------------------------------------------ */
+.title {
+  margin-bottom: 40px;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  position: relative;
+  z-index: 1;
+  transition: color 0.9s ease;
+}
+
+body.light .title {
+  color: #f6d365;
+}
+
+
+/* ------------------------------------------------------------
+   CONTAINER PRINCIPAL
+   Flexbox horizontal que posiciona lâmpada e formulário lado a lado.
+   ------------------------------------------------------------ */
+.container {
+  display: flex;
+  gap: 80px;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+
+/* ------------------------------------------------------------
+   LÂMPADA — WRAPPER
+   Agrupa todas as partes visuais da lâmpada.
+   Escala levemente no hover e comprime no clique.
+   ------------------------------------------------------------ */
+.lamp {
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s ease;
+  outline: none;
+}
+
+/* Indicador de foco para navegação por teclado */
+.lamp:focus-visible {
+  outline: 2px dashed var(--accent-from);
+  outline-offset: 10px;
+  border-radius: 4px;
+}
+
+.lamp:hover  { transform: scale(1.05); }
+.lamp:active { transform: scale(0.95); }
+
+
+/* ------------------------------------------------------------
+   ABAJUR
+   Parte superior arredondada da lâmpada.
+   Ganha brilho difuso ao acender, simulando a emissão de luz.
+   ------------------------------------------------------------ */
+.lamp-top {
+  width: 120px;
+  height: 60px;
+  background: var(--lamp-color);
+  border-radius: 60px 60px 0 0;
+  transition: box-shadow 0.7s ease;
+}
+
+body.light .lamp-top {
+  box-shadow:
+    0 0 22px rgba(255, 230, 100, 0.35),   /* brilho próximo                */
+    0 0 60px rgba(255, 200,  60, 0.12);   /* halo distante suave           */
+  transition: box-shadow 1.2s ease;
+}
+
+
+/* ------------------------------------------------------------
+   HASTE
+   Barra vertical que conecta o abajur à base.
+   ------------------------------------------------------------ */
+.lamp-body {
+  width: 15px;
+  height: 90px;
+  background: var(--lamp-color);
+  margin: auto;
+}
+
+
+/* ------------------------------------------------------------
+   BASE
+   Apoio horizontal no rodapé da lâmpada.
+   ------------------------------------------------------------ */
+.lamp-base {
+  width: 80px;
+  height: 20px;
+  background: var(--lamp-color);
+  margin: auto;
+  border-radius: 0 0 10px 10px;
+}
+
+
+/* ------------------------------------------------------------
+   CORDÃO
+   Linha fina que pende abaixo da base.
+   Nenhum transform ou animation é definido aqui — todo o
+   movimento de pêndulo é controlado pelo JavaScript via
+   Web Animations API, evitando conflitos com outros estados.
+   ------------------------------------------------------------ */
+.cord {
+  width: 2px;
+  height: 40px;
+  background: var(--cord-color);
+  margin: auto;
+  position: relative;
+  transform-origin: top center;   /* pivô no topo para rotação correta */
+}
+
+/* Bolinha decorativa no topo do cordão */
+.cord-ball {
+  width: 8px;
+  height: 8px;
+  background: var(--ball-color);
+  border-radius: 50%;
+  position: absolute;
+  top: -6px;
+  left: -3px;
+  transition: box-shadow 0.5s ease;
+}
+
+/* Bolinha ganha um leve brilho quando a luz está acesa */
+body.light .cord-ball {
+  box-shadow: 0 0 8px 3px rgba(207, 164, 109, 0.6);
+}
+
+
+/* ------------------------------------------------------------
+   FORMULÁRIO DE LOGIN
+   Começa deslocado e invisível; desliza para o lugar ao acender.
+   pointer-events desabilitado enquanto oculto para não capturar
+   cliques acidentais antes de estar visível.
+   ------------------------------------------------------------ */
+.login-form {
+  opacity: 0;
+  transform: translateY(40px) scale(0.95);
+  transition: opacity 0.6s cubic-bezier(.22, 1, .36, 1),
+              transform 0.6s cubic-bezier(.22, 1, .36, 1);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 30px;
+  border-radius: 15px;
+  pointer-events: none;
+  width: 280px;
+}
+
+/* Formulário visível e interativo com a luz acesa */
+body.light .login-form {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* Título interno do formulário */
+.login-form h2 {
+  margin-bottom: 16px;
+  font-weight: 400;
+  font-size: 1.4rem;
+  letter-spacing: 0.04em;
+}
+
+/* Labels em caixa alta com opacidade reduzida */
+.login-form label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 4px;
+  margin-top: 14px;
+}
+
+/* Campos de texto com fundo semitransparente */
+.login-form input {
+  display: block;
+  margin: 0 0 4px 0;
+  padding: 12px;
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.login-form input::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* Borda dourada suave ao focar no campo */
+.login-form input:focus {
+  outline: none;
+  border-color: rgba(246, 211, 101, 0.4);
+  box-shadow: 0 0 10px rgba(246, 211, 101, 0.25);
+}
+
+/* Botão com gradiente dourado-laranja */
+.login-form button {
+  margin-top: 20px;
+  padding: 12px;
+  width: 100%;
+  background: linear-gradient(45deg, var(--accent-from), var(--accent-to));
+  border: none;
+  border-radius: 10px;
+  color: #1a0f00;
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-form button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 18px rgba(246, 211, 101, 0.45);
+}
+
+.login-form button:active {
+  transform: scale(0.98);
+}
+
+
+/* ------------------------------------------------------------
+   RESPONSIVIDADE
+   Em telas até 640px a lâmpada e o formulário empilham
+   verticalmente para caberem sem scroll horizontal.
+   ------------------------------------------------------------ */
+@media (max-width: 640px) {
+  .container {
+    flex-direction: column;
+    gap: 36px;
+  }
+
+  .login-form {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .title {
+    margin-bottom: 28px;
+    font-size: 1.4rem;
+  }
+}
+
+/* Ajuste extra de padding em telas muito pequenas */
+@media (max-width: 360px) {
+  body {
+    padding: 16px;
+  }
+
+  .login-form {
+    padding: 22px 18px;
+  }
+}
